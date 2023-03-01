@@ -2,29 +2,29 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Affectation;
+use App\Models\Device;
+use App\Models\Assignment;
 use App\Models\Patient;
 use Illuminate\Support\Facades\DB;
-use App\Models\Appareil;
 
 class StatisticsController extends Controller
 {
 
-    public function Statistics()
+    public function statistics()
     {
-         $data = [
-        'TotalDevices' => Appareil::all()->count(),
-        'AvailableDevices' => DB::table('Appareil')
-            ->where('etatAffectation', 0)
-            ->get()->count(),
-        'AssignedDevices' => Affectation::all()->count(),
-        'TotalPatients' => Patient::all()->count(),
-        'PatientsHaveDevice' => DB::table('Patient')
-            ->where('etatAffectation', 1)
-            ->get()->count(),
-        'PatientswithNoDevice' => DB::table('Patient')
-            ->where('etatAffectation', 0)
-            ->get()->count(),
+        $data = [
+            'TotalDevices' => Device::all()->count(),
+            'AvailableDevices' => DB::table('Device')
+                ->where('assignmentStatus', 0)
+                ->get()->count(),
+            'AssignedDevices' => Assignment::all()->count(),
+            'TotalPatients' => Patient::all()->count(),
+            'PatientsHaveDevice' => DB::table('Patient')
+                ->where('assignmentStatus', 1)
+                ->get()->count(),
+            'PatientswithNoDevice' => DB::table('Patient')
+                ->where('assignmentStatus', 0)
+                ->get()->count(),
         ];
         return $data;
     }

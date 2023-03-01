@@ -5,11 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Assignment extends Model
+class Gps extends Model
 {
     use HasFactory;
-    public $table = 'Assignment';
-    protected $fillable = [
-        'idAssignment','idPatient','returnDate',
-    ];
+    public $table = 'Gps';
+    protected $primaryKey = 'idGps';
+    protected $fillable = ['idPatient',];
 }

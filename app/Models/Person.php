@@ -9,6 +9,7 @@ class Person extends Model
 {
     use HasFactory;
     public $table = 'Person';
-    public $timestamps = false;
+    protected $primaryKey = 'idPerson';
+        public $timestamps = false;
     protected $fillable = ['firstName', 'lastName', 'birthdate','telNum', 'adress', 'email'];
 }

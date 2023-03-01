@@ -17,6 +17,10 @@ return new class extends Migration
             $table->foreign('idPerson')->references('idPerson')->on('person')->onDelete('cascade')->onUpdate('cascade');
             $table->boolean('assignmentStatus')->default(false);
         });
+        DB::unprepared('CREATE TRIGGER person_from_patient_delete AFTER DELETE ON PATIENT FOR EACH ROW
+        BEGIN
+            DELETE FROM person WHERE idPerson = OLD.idPerson;
+        END;');
     }
 
     /**
@@ -24,6 +28,7 @@ return new class extends Migration
      */
     public function down(): void
     {
+        DB::unprepared('DROP TRIGGER IF EXISTS person_from_patient_delete');
         Schema::dropIfExists('patient');
     }
 };

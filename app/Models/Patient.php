@@ -9,12 +9,9 @@ class Patient extends Model
 {
     use HasFactory;
     public $table = 'Patient';
+    public $primaryKey = 'idPatient';
     protected $fillable = [
         'idPerson',
         'assignmentStatus',
     ];
-    // public function Person()
-    // {
-    //     return $this->belongsTo(Person::class, 'idPerson');
-    // }
 }

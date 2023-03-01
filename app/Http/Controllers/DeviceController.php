@@ -23,14 +23,25 @@ class DeviceController extends Controller
         return Device::all();
     }
     public function device($id){
-        return Device::get()->where('idAppareil' , '=' , $id);
+        return Device::get()->where('idDevice' , '=' , $id);
     }
-    /**
-     * Store a newly created resource in storage.
-     */
+    // TODO STORE DEVICE
     public function store(Request $request)
     {
-        //
+
+        $data = $request->validate([
+            'idDevice' => 'required|integer|unique:device,idDevice',
+        ]);
+        $device = Device::create([
+            'idDevice' => $data['idDevice'],
+            'assignmentStatus' => false,
+            'isOnline' => false,
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $device,
+        ]);
     }
 
     /**

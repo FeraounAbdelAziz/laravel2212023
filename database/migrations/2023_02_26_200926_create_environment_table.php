@@ -11,15 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('person', function (Blueprint $table) {
-            $table->id('idPerson');
-            $table->string('firstName');
-            $table->string('lastName');
-            $table->date('birthdate');
-            $table->string('telNum', 10);
-            $table->string('adress');
-            $table->string('email');
-            $table->unique('email');
+        Schema::create('environment', function (Blueprint $table) {
+            $table->id('idEnvironment');
+            $table->unsignedBigInteger('idPatient');
+            $table->foreign('idPatient')->references('idPatient')->on('patient')->onDelete('cascade')->onUpdate('cascade');
             $table->timestamp('dateCreate')->useCurrent();
         });
     }
@@ -29,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('person');
+        Schema::dropIfExists('environment');
     }
 };
