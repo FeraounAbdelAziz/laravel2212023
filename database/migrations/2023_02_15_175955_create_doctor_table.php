@@ -12,10 +12,12 @@ return new class extends Migration {
     {
         Schema::create('doctor', function (Blueprint $table) {
             $table->id('idDoctor');
+            $table->string('email');
             $table->string('password');
             $table->boolean('isVerified')->default(false);
             $table->unsignedBigInteger('idPerson');
             $table->foreign('idPerson')->references('idPerson')->on('person')->onDelete('cascade')->onUpdate('cascade');
+            $table->unique('email');
         });
         DB::unprepared('CREATE TRIGGER person_from_doctor_delete AFTER DELETE ON DOCTOR FOR EACH ROW
         BEGIN

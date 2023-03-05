@@ -30,27 +30,21 @@ class EmailVerificationNotification extends Notification
         $this->otp = new Otp;
     }
 
-    /**
-     * Get the notification's delivery channels.
-     *
-     * @return array<int, string>
-     */
+
     public function via($notifiable): array
     {
         return ['mail'];
     }
 
-    /**
-     * Get the mail representation of the notification.
-     */
+
     public function toMail($notifiable)
     {
 
         // dd($notifiable->idDoctor);
         $doctor = Doctor::find($notifiable->idDoctor);
-        $email = $doctor->person->email;
+        $email = $doctor->email;
         $firstName = $doctor->person->firstName;
-        $otp = $this->otp->generate($email, 6, 60); // 60 min 6 digits
+        $otp = $this->otp->generate($email, 6, 10); // 6 digits token and 10 min to expired the token
         Log::info('Sending verification email to ' . $email );
         return (new MailMessage)
         ->mailer('smtp')
@@ -60,11 +54,7 @@ class EmailVerificationNotification extends Notification
         ->line('code: ' . $otp->token);
     }
 
-    /**
-     * Get the array representation of the notification.
-     *
-     * @return array<string, mixed>
-     */
+
     public function toArray(object $notifiable): array
     {
         return [

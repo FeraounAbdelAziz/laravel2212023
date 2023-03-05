@@ -10,24 +10,28 @@ use Illuminate\Support\Facades\DB;
 class PatientController extends Controller
 {
 
-    public function index(){
+    public function index()
+    {
         return DB::table('patient')
             ->join('person', 'patient.idPerson', '=', 'person.idPerson')
-            ->select('patient.*','person.*' )
+            ->select('patient.*', 'person.*')
             ->get();
     }
 
-    public function store(Request $request){
+    public function store(Request $request)
+    {
         $request->validate([
             'firstName' => 'required',
             'lastName' => 'required',
             'birthdate' => 'required|date',
             'telNum' => 'required',
             'adress' => 'required',
-            'email' => 'required|email',
         ]);
+        $personData = $request->only(['firstName', 'lastName', 'telNum', 'adress']);
+        $personData['birthdate'] = date_format(date_create($request->birthdate), 'Y-m-d');
 
-        $person = Person::create($request->only(['firstName', 'lastName', 'birthdate', 'telNum', 'adress', 'email']));
+        $person = Person::create($personData);
+
         DB::table('patient')->insert([
             'idPerson' => $person->idPerson,
             'assignmentStatus' => false,
@@ -58,12 +62,11 @@ class PatientController extends Controller
             'birthdate' => 'required|date',
             'telNum' => 'required',
             'adress' => 'required',
-            'email' => 'required|email',
         ]);
 
         // Update the person's information
         $person = Person::findOrFail($id);
-        $person->update($request->only(['firstName', 'lastName', 'birthdate', 'telNum', 'adress', 'email']));
+        $person->update($request->only(['firstName', 'lastName', 'birthdate', 'telNum', 'adress']));
 
         // Update the patient's assignment status
         $patient = DB::table('patient')
@@ -72,15 +75,12 @@ class PatientController extends Controller
 
         return response()->json($patient);
     }
- //TODO LATER search
-    public function search($name)
+    //TODO LATER search
+    public function search($telNum)
     {
-        return Patient::where('firstName', 'like', '%' . $name . '%')->get();
+        return Patient::where('telNum', 'like', '%' . $telNum . '%')->get();
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
         return Patient::destroy($id);

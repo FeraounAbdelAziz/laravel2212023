@@ -29,7 +29,7 @@ class AssignmentController extends Controller
     /**
      * Display the specified resource.
      */
-    public function affectation($id)
+    public function assignment($id)
     {
         return DB::table('assignment')
             ->join('patient', 'patient.idPatient', '=', 'assignment.idPatient')

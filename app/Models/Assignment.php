@@ -10,6 +10,6 @@ class Assignment extends Model
     use HasFactory;
     public $table = 'Assignment';
     protected $fillable = [
-        'idAssignment','idPatient','returnDate',
+        'idAssignment','idPatient','returnDate' , 'dateAssignment',
     ];
 }

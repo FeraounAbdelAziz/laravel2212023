@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -21,6 +20,12 @@ return new class extends Migration
         BEGIN
             DELETE FROM person WHERE idPerson = OLD.idPerson;
         END;');
+         DB::unprepared('CREATE TRIGGER person_from_device_update BEFORE DELETE ON PATIENT FOR EACH ROW
+         BEGIN
+             UPDATE device
+             SET assignmentStatus = 0
+             WHERE idDevice = (SELECT idDevice FROM assignment WHERE idPatient = OLD.idPatient);
+         END;');
     }
 
     /**
@@ -29,6 +34,7 @@ return new class extends Migration
     public function down(): void
     {
         DB::unprepared('DROP TRIGGER IF EXISTS person_from_patient_delete');
+        DB::unprepared('DROP TRIGGER IF EXISTS person_from_device_update');
         Schema::dropIfExists('patient');
     }
 };

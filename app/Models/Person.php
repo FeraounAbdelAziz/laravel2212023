@@ -11,5 +11,5 @@ class Person extends Model
     public $table = 'Person';
     protected $primaryKey = 'idPerson';
         public $timestamps = false;
-    protected $fillable = ['firstName', 'lastName', 'birthdate','telNum', 'adress', 'email'];
+    protected $fillable = ['firstName', 'lastName', 'birthdate','telNum', 'adress'];
 }

@@ -2,19 +2,31 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\EmailVerificationRequest;
 use App\Models\Doctor;
 use App\Models\Person;
 use App\Notifications\EmailVerificationNotification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use Otp;
 
 
 class AuthController extends Controller
 {
+
+
+    private $otp;
+
+    public function __construct()
+    {
+        $this->otp = new Otp;
+    }
     public function register(Request $request)
     {
         $request->validate([
-            'email' => 'required|string|unique:person,email',
+            'email' => 'required|string|unique:doctor,email',
             'password' => 'required|string|confirmed',
             'firstName' => 'required|string',
             'lastName' => 'required|string',
@@ -22,39 +34,37 @@ class AuthController extends Controller
             'birthdate' => 'required|string',
             'telNum' => 'required|string',
         ]);
-        $request->validate([
-            'email' => 'required|string|unique:person,email',
-            'password' => 'required|string|confirmed',
-            'firstName' => 'required|string',
-            'lastName' => 'required|string',
-            'adress' => 'required|string',
-            'birthdate' => 'required|string',
-            'telNum' => 'required|string',
-        ]);
-
+        $existEmail = Doctor::where('email', $request->email)->first();
+        if ($existEmail) {
+            $existEmail->notify(new EmailVerificationNotification());
+            // TODO : update the person profile HERE
+            return response()->json([
+                'doctor' => $existEmail,
+            ]);
+        }
         $person = Person::create([
-            'email' => $request->email,
             'firstName' => $request->firstName,
             'lastName' => $request->lastName,
             'adress' => $request->adress,
             'birthdate' => $request->birthdate,
-            'telNum' => $request->telNum
+            'telNum' => $request->telNum,
         ]);
-
         $doctor = Doctor::create([
+            'email' => $request->email,
             'password' => bcrypt($request->password),
             'idPerson' => $person->idPerson, // set idPerson to the id of the newly created person
         ]);
-        // ->sendEmailVerificationNotification();
+        $token = Auth::guard('api')->attempt(['email' => $request->email, 'password' => $request->password]);
 
-        $token = $doctor->createToken('DoctorToken' . $person->idPerson)->plainTextToken;
         $doctor->notify(new EmailVerificationNotification());
+
         $response = [
-            'doctor' => $doctor,
-            'token' => $token,
+            'email' => $doctor->email,
+            'access_token' => $token,
         ];
         return response($response, 201);
     }
+
     public function login(Request $request)
     {
         $request->validate([
@@ -62,18 +72,10 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
 
-        $person = Person::where('email', $request->email)->first();
-
-        if (!$person) {
-            return response([
-                'message' => 'Email not found'
-            ], 401);
-        }
-        $doctor = Doctor::where('idPerson', $person->idPerson)->first();
-        // return response()->json($doctor);
+        $doctor = Doctor::where('email', $request->email)->first();
         if (!$doctor) {
             return response([
-                'message' => 'Unauthorized'
+                'isUserExist' => 0
             ], 401);
         }
 
@@ -82,51 +84,49 @@ class AuthController extends Controller
                 'message' => 'Password is incorrect'
             ], 401);
         }
-        $token = $doctor->createToken('DoctorToken' . $person->idPerson)->plainTextToken;
 
-        $expiresAt = now()->addMinutes(10);
-        $response = [
-            'doctor' => $doctor,
-            'access_token' => $token,
-            'token_type' => 'Bearer',
-            'expires_at' => $expiresAt->toDateTimeString(),
-        ];
-        return response($response, 201);
+        $JWTtoken = Auth::guard('api')->attempt(['email' => $request->email, 'password' => $request->password]);
+        $doctor->notify(new EmailVerificationNotification());
+        if ($JWTtoken && $doctor->isVerified) {
+            $response = [
+                'email' => $doctor->email,
+                'access_token' => JWTAuth::fromUser($doctor),
+            ];
+            return response($response, 200);
+        } else {
+            return response([
+                'message' => 'Unauthorized'
+            ], 401);
+        }
     }
+
+    public function sendEmailVerification(Request $request)
+    {
+        $doctor = Doctor::where('email', $request->email)->first();
+        $doctor->notify(new EmailVerificationNotification());
+        return response()->json([
+            'success' => 1,
+        ], 200);
+    }
+
+    public function checkEmailVerification(EmailVerificationRequest $request)
+    {
+        $otp = $this->otp->validate($request->email, $request->otp);
+        if (!($otp->status)) {
+            return response()->json([
+                'error' => $otp
+            ], 401);
+        }
+        $doctor = Doctor::where('email', $request->email)->first();
+        $doctor->update(['isVerified' => true]);
+        return response()->json([
+            'access_token' => JWTAuth::fromUser($doctor),
+        ], 200);
+    }
+
     public function logout(Request $request)
     {
-
-        auth()->user()->tokens()->delete();
-        return [
-            'message' => 'logged out',
-        ];
-    }
-    public function verify($user_id, Request $request)
-    {
-        if (!$request->hasValidSignature()) {
-            return $this->response(
-                ['msg' => 'unauthorized XD'],
-                401
-            );
-        }
-        $doctor = Doctor::findOrFail($user_id);
-        if (!$doctor->hasVerifiedEmail()) {
-            $doctor->markEmailAsVerified();
-        }
-        return redirect()->to('/');
-    }
-    public function resend()
-    {
-        if (auth()->user()->hasVerifiedEmail()) {
-            return response(
-                ['msg' => 'resend idk XD'],
-                401
-            );
-        }
-        auth()->user()->sendEmailVerificationNotification();
-        return response(
-            ['msg' => 'success XD'],
-            200
-        );
+        auth()->logout();
+        return response()->json(['message' => 'Successfully logged out']);
     }
 }

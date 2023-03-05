@@ -13,10 +13,10 @@ return new class extends Migration {
         Schema::create('assignment', function (Blueprint $table) {
             $table->id('idAssignment');
             $table->unsignedBigInteger('idDevice');
-            $table->foreign('idDevice')->references('idDevice')->on('device');
+            $table->foreign('idDevice')->references('idDevice')->on('device')->onDelete('cascade')->onUpdate('cascade');
 
             $table->unsignedBigInteger('idPatient');
-            $table->foreign('idPatient')->references('idPatient')->on('patient');
+            $table->foreign('idPatient')->references('idPatient')->on('patient')->onDelete('cascade')->onUpdate('cascade');
 
             $table->timestamp('dateAssignment')->useCurrent();
             $table->date('returnDate');

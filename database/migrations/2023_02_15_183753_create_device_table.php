@@ -15,6 +15,12 @@ return new class extends Migration {
             $table->boolean('assignmentStatus')->default(false);
             $table->boolean('isOnline')->default(false);
         });
+        DB::unprepared('CREATE TRIGGER patient_from_device_update BEFORE DELETE ON device FOR EACH ROW
+         BEGIN
+             UPDATE patient
+             SET assignmentStatus = 0
+             WHERE idPatient = (SELECT idPatient FROM assignment WHERE idDevice = OLD.idDevice);
+         END;');
     }
 
     /**
@@ -22,6 +28,8 @@ return new class extends Migration {
      */
     public function down()
     {
+        DB::unprepared('DROP TRIGGER IF EXISTS patient_from_device_update');
+
         Schema::dropIfExists('device');
     }
 };

@@ -15,11 +15,9 @@ return new class extends Migration
             $table->id('idPerson');
             $table->string('firstName');
             $table->string('lastName');
-            $table->date('birthdate');
             $table->string('telNum', 10);
             $table->string('adress');
-            $table->string('email');
-            $table->unique('email');
+            $table->date('birthdate');
             $table->timestamp('dateCreate')->useCurrent();
         });
     }
