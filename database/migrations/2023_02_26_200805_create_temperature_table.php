@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('temperature', function (Blueprint $table) {
             $table->id('idTemperature');
+            $table->float('tempValue');
             $table->unsignedBigInteger('idPatient');
             $table->foreign('idPatient')->references('idPatient')->on('patient')->onDelete('cascade')->onUpdate('cascade');
             $table->timestamp('dateCreate')->useCurrent();

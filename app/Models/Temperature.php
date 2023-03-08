@@ -10,5 +10,6 @@ class Temperature extends Model
     use HasFactory;
     public $table = 'Temperature';
     protected $primaryKey = 'idTemperature';
-    protected $fillable = ['idPatient',];
+    public $timestamps = false;
+    protected $fillable = ['idPatient','tempValue'];
 }
