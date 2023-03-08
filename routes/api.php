@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\StatisticsController;
+use App\Http\Controllers\TemperatureController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -15,11 +16,15 @@ Route::post('/login ', [AuthController::class, 'login']);
 Route::post('/register ', [AuthController::class, 'register']);
 Route::post('/check-email', [AuthController::class, 'checkEmailVerification']);
 Route::post('/resend', [AuthController::class, 'sendEmailVerification']);
+Route::get('/patientTemp/{idPatient}', [TemperatureController::class, 'patientTemp']);
+Route::post('/patientTemp/{idPatient}/getTemperaturesForDateRange', [TemperatureController::class, 'getTemperaturesForDateRange']);
+
 
 Route::group(['middleware' => ['api', 'checkAdminToken:api']], function () {
 
-    Route::get('/statistics', [StatisticsController::class, 'statistics']); 
+
     Route::resource('patient', PatientController::class); // DONE
+    Route::get('/statistics', [StatisticsController::class, 'statistics']);
     Route::post('/logout ', [AuthController::class, 'logout']);
     Route::post('/device ', [DeviceController::class, 'store']);
     Route::delete('/device/{id} ', [DeviceController::class, 'destroy']);
