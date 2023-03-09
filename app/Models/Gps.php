@@ -10,5 +10,6 @@ class Gps extends Model
     use HasFactory;
     public $table = 'Gps';
     protected $primaryKey = 'idGps';
+    public $timestamps = false;
     protected $fillable = ['idPatient',];
 }

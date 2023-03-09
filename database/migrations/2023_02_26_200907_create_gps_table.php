@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('gps', function (Blueprint $table) {
             $table->id('idGps');
+            $table->string('latitude');
+            $table->string('longitude');
             $table->unsignedBigInteger('idPatient');
             $table->foreign('idPatient')->references('idPatient')->on('patient')->onDelete('cascade')->onUpdate('cascade');
             $table->timestamp('dateCreate')->useCurrent();

@@ -4,6 +4,7 @@
 use App\Http\Controllers\AssignmentController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DeviceController;
+use App\Http\Controllers\GpsController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\TemperatureController;
@@ -16,11 +17,21 @@ Route::post('/login ', [AuthController::class, 'login']);
 Route::post('/register ', [AuthController::class, 'register']);
 Route::post('/check-email', [AuthController::class, 'checkEmailVerification']);
 Route::post('/resend', [AuthController::class, 'sendEmailVerification']);
-Route::get('/patientTemp/{idPatient}', [TemperatureController::class, 'patientTemp']);
-Route::post('/patientTemp/{idPatient}/getTemperaturesForDateRange', [TemperatureController::class, 'getTemperaturesForDateRange']);
 
 
 Route::group(['middleware' => ['api', 'checkAdminToken:api']], function () {
+
+
+
+//Gps Controller
+    Route::post('/getLastGpsPatient/{idPatient}', [GpsController::class, 'getLastGpsPatient']);
+    Route::post('/getGpsForDateRange/{idPatient}', [GpsController::class, 'getGpsForDateRange']); //TODO DONE HERE REACT
+
+
+//Temperature Controller
+    Route::post('/lastTemperatureRecord/{idPatient}', [TemperatureController::class, 'lastTemperatureRecord']);
+    Route::get('/patientTemp/{idPatient}', [TemperatureController::class, 'patientTemp']);
+    Route::post('/patientTemp/getTemperaturesForDateRange/{idPatient}', [TemperatureController::class, 'getTemperaturesForDateRange']);
 
 
     Route::resource('patient', PatientController::class); // DONE

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('heartBeat', function (Blueprint $table) {
             $table->id('idHeartBeat');
-            $table->float('bcValue');
+            $table->float('hbValue');
             $table->unsignedBigInteger('idPatient');
             $table->foreign('idPatient')->references('idPatient')->on('patient')->onDelete('cascade')->onUpdate('cascade');
             $table->timestamp('dateCreate')->useCurrent();
