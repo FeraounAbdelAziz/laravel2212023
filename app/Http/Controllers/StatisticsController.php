@@ -27,6 +27,7 @@ class StatisticsController extends Controller
             ->where('assignmentStatus', 0)
             ->get()->count(),
             'TotalUsers' => Doctor::all()->count(),
+            // 'LostDevices' => Doctor::all()->count(),
         ];
         return $data;
     }

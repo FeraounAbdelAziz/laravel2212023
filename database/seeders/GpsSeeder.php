@@ -9,6 +9,6 @@ class GpsSeeder extends Seeder
 {
     public function run()
     {
-        Gps::factory()->count(50)->create();
+        Gps::factory()->count(20)->create();
     }
 }

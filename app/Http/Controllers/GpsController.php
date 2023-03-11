@@ -10,6 +10,21 @@ use Illuminate\Support\Facades\DB;
 
 class GpsController extends Controller
 {
+
+
+    public function getGpsPatient(Request $request, $idPatient)
+    {
+
+        $GpsS = Gps::where('idPatient', $idPatient)
+            ->whereRaw('DATE(dateCreate) = ?', [$request->dateConsult]) // this convert the YYYY-MM-DD to YYYY-MM-DD HH-MM-SS
+            ->select('gps.longitude', 'gps.latitude', 'gps.dateCreate')
+            ->get();
+
+        return response()->json([
+            'gps' => $GpsS
+        ]);
+    }
+
     public function getLastGpsPatient(string $idPatient)
     {
         return Gps::where('idPatient', $idPatient)

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 
+use Carbon\Carbon;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -26,7 +27,7 @@ class Doctor extends Authenticatable implements JWTSubject
     {
         return $this->belongsTo(Person::class, 'idPerson');
     }
-     // Rest omitted for brevity
+    // Rest omitted for brevity
 
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.
@@ -46,6 +47,8 @@ class Doctor extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims()
     {
         return [
+            'email' => $this->email,
+            'exp' => Carbon::now()->addHours(24)->timestamp,
         ];
     }
 

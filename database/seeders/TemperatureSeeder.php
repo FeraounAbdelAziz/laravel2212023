@@ -55,6 +55,17 @@ class TemperatureSeeder extends Seeder
 
                 $dateCreate = $dateCreate->addSeconds(5);
             }
+            for ($i = 0; $i < 10; $i++) {
+                $tempValue = mt_rand(350, 400) / 10;
+
+                DB::table('temperature')->insert([
+                    'tempValue' => $tempValue,
+                    'idPatient' => $otherPatient->idPatient,
+                    'dateCreate' => $dateCreate,
+                ]);
+
+                $dateCreate = $dateCreate->addSeconds(5);
+            }
         }
     }
 }

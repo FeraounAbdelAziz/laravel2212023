@@ -84,13 +84,10 @@ class AuthController extends Controller
                 'message' => 'Password is incorrect'
             ], 401);
         }
-
-        $JWTtoken = Auth::guard('api')->attempt(['email' => $request->email, 'password' => $request->password]);
         $doctor->notify(new EmailVerificationNotification());
-        if ($JWTtoken && $doctor->isVerified) {
+        if ($doctor->isVerified) {
             $response = [
                 'email' => $doctor->email,
-                'access_token' => JWTAuth::fromUser($doctor),
             ];
             return response($response, 200);
         } else {
@@ -120,7 +117,7 @@ class AuthController extends Controller
         $doctor = Doctor::where('email', $request->email)->first();
         $doctor->update(['isVerified' => true]);
         return response()->json([
-            'access_token' => JWTAuth::fromUser($doctor),
+            'access_token' => JWTAuth::fromUser($doctor, ['exp' => now()->addHour()->timestamp]),
         ], 200);
     }
 

@@ -8,22 +8,39 @@ use Illuminate\Http\Request;
 
 class DeviceController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function deviceAffect(){
-        return DB::table('Assignment')
+
+    public function deviceAssignment()
+    {
+        $assignedDevices = DB::table('Assignment')
             ->join('device', 'device.idDevice', '=', 'Assignment.idDevice')
             ->join('patient', 'patient.idPatient', '=', 'Assignment.idPatient')
             ->join('person', 'patient.idPerson', '=', 'person.idPerson')
-            ->select('patient.*', 'device.*', 'person.*')
+            ->select('patient.*', 'device.*', 'person.*', 'assignment.returnDate')
             ->get();
+        $unassignedDevices = DB::table('Device')
+            ->where('assignmentStatus', 0)->select('device.*')->get();
+        foreach ($unassignedDevices as $unassigned) {
+            if ($unassigned->assignmentStatus === 0) {
+                $unassigned->idPatient = "null";
+                $unassigned->idPerson = "null";
+                $unassigned->firstName = "null";
+                $unassigned->lastName = "null";
+                $unassigned->telNum = "null";
+                $unassigned->adress = "null";
+                $unassigned->birthdate = "null";
+                $unassigned->dateCreate = "null";
+                $unassigned->returnDate = "null";
+            }
+        }
+        $allDevices = array_merge($assignedDevices->toArray(), $unassignedDevices->toArray());
+        return response([
+            "allDevices" => $allDevices,
+        ]);
     }
-    public function allDevices(){
-        return Device::all();
-    }
-    public function search($id){
-        return Device::get()->where('idDevice' , '=' , $id);
+
+    public function search($idDevice)
+    {
+        return Device::get()->where('idDevice', '=', $idDevice);
     }
     // TODO DONE
     public function store(Request $request)

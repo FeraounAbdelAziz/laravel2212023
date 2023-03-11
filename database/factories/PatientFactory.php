@@ -12,11 +12,12 @@ class PatientFactory extends Factory
 
     public function definition()
     {
+
         return [
             'idPerson' => function () {
                 return Person::factory()->create()->idPerson;
             },
-            'assignmentStatus' => $this->faker->boolean,
+            'assignmentStatus' => false,
         ];
     }
 }

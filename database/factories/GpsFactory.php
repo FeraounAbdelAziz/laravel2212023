@@ -20,7 +20,7 @@ class GpsFactory extends Factory
             'latitude' => $latitude,
             'longitude' => $longitude,
             'idPatient' => function () {
-                return Patient::factory()->create()->idPatient;
+                return Patient::pluck('idPatient')->random();
             },
             'dateCreate' => $this->faker->dateTimeBetween('-1 month', 'now'),
         ];

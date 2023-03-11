@@ -2,18 +2,50 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Patient;
 use App\Models\Temperature;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class TemperatureController extends Controller
 {
-    public function patientTemp(string $idPatient)
+    public function getTempPatient(Request $request, string $idPatient)
     {
-        return Temperature::where('idPatient', '=', $idPatient)
+        $Temperature = Temperature::where('idPatient', '=', $idPatient)
+            ->whereRaw('DATE(dateCreate) = ?', $request->dateConsult) // this convert the YYYY-MM-DD to YYYY-MM-DD HH-MM-SS
+            ->take(10)
+            ->select("temperature.tempValue", "temperature.dateCreate")
             ->get();
+        $filteredTemperatures = collect([]);
+
+        foreach ($Temperature as $key => $temperature) {
+            if ($key === 0) {
+                // add first temperature to the filtered collection
+                $filteredTemperatures->push($temperature);
+            } else {
+                $prevTemperature = $Temperature[$key - 1];
+
+                $date1 = Carbon::parse($temperature->dateCreate);
+                $date2 = Carbon::parse($prevTemperature->dateCreate);
+
+                $diffInSeconds = $date2->diffInSeconds($date1);
+                if ($diffInSeconds >= 5) {
+                    $filteredTemperatures->push($temperature);
+                }
+            }
+        }
+
+        $tempValue = $Temperature->map(function ($temperature) {
+            return $temperature->tempValue;
+        })->sort()->values();
+
+        $dateCreate = $Temperature->map(function ($temperature) {
+            return $temperature->dateCreate;
+        })->sort()->values();
+        return response()->json([
+            'tempValue' => $tempValue,
+            'dateCreate' => $dateCreate,
+        ]);
+
     }
 
 
@@ -72,14 +104,9 @@ class TemperatureController extends Controller
             ];
         }
         return response()->json([
-            'temperatures' => $finalResult
+            'temperatures' => array_values($finalResult)
         ]);
     }
-
-
-
-
-
 
     public function lastTemperatureRecord(string $idPatient)
     {
@@ -119,5 +146,4 @@ class TemperatureController extends Controller
             'dateCreate' => $dateCreate,
         ]);
     }
-
 }

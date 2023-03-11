@@ -23,25 +23,27 @@ Route::group(['middleware' => ['api', 'checkAdminToken:api']], function () {
 
 
 
-//Gps Controller
+    //Gps Controller
+    Route::post('/getGpsPatient/{idPatient}', [GpsController::class, 'getGpsPatient']);
     Route::post('/getLastGpsPatient/{idPatient}', [GpsController::class, 'getLastGpsPatient']);
-    Route::post('/getGpsForDateRange/{idPatient}', [GpsController::class, 'getGpsForDateRange']); //TODO DONE HERE REACT
+    Route::post('/getGpsForDateRange/{idPatient}', [GpsController::class, 'getGpsForDateRange']);
 
-
-//Temperature Controller
+    //Temperature Controller
+    Route::post('/getTempPatient/{idPatient}', [TemperatureController::class, 'getTempPatient']);
     Route::post('/lastTemperatureRecord/{idPatient}', [TemperatureController::class, 'lastTemperatureRecord']);
-    Route::get('/patientTemp/{idPatient}', [TemperatureController::class, 'patientTemp']);
     Route::post('/patientTemp/getTemperaturesForDateRange/{idPatient}', [TemperatureController::class, 'getTemperaturesForDateRange']);
 
 
     Route::resource('patient', PatientController::class); // DONE
     Route::get('/statistics', [StatisticsController::class, 'statistics']);
     Route::post('/logout ', [AuthController::class, 'logout']);
-    Route::post('/device ', [DeviceController::class, 'store']);
+
     Route::delete('/device/{id} ', [DeviceController::class, 'destroy']);
-    Route::get('/device/{id} ', [DeviceController::class, 'search']);
-    Route::get('/deviceAffect ', [DeviceController::class, 'deviceAffect']);
-    Route::get('/allDevices ', [DeviceController::class, 'allDevices']);
+    Route::post('/device ', [DeviceController::class, 'store']);
+    Route::post('/device/{id} ', [DeviceController::class, 'search']);
+    Route::get('/deviceAssignment ', [DeviceController::class, 'deviceAssignment']);
+
+
     Route::get('/assignment ', [AssignmentController::class, 'index']);
     Route::get('/assignment/{assignment} ', [AssignmentController::class, 'assignment']);
 });

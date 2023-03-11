@@ -12,12 +12,29 @@ class PatientController extends Controller
 
     public function index()
     {
-        return DB::table('patient')
+        $assignedPatients = DB::table('patient')
             ->join('person', 'patient.idPerson', '=', 'person.idPerson')
+            ->join('assignment', 'patient.idPatient', '=', 'assignment.idPatient')
+            ->select('patient.*', 'person.*', 'assignment.*')
+            ->get();
+        $unassignedPatients = DB::table('patient')
+            ->join('person', 'patient.idPerson', '=', 'person.idPerson')
+            ->where('patient.assignmentStatus', '0')
+            // ->leftJoin('assignment', 'patient.idPatient', '=', 'assignment.idPatient')
+            // ->whereNull('assignment.idAssignment')
             ->select('patient.*', 'person.*')
             ->get();
+        foreach ($unassignedPatients as $unassigned) {
+            if ($unassigned->assignmentStatus === 0) {
+                $unassigned->idDevice = "null";
+                $unassigned->idAssignment = "Not assigned yet";
+            }
+        }
+        $allPatients = array_merge($assignedPatients->toArray(), $unassignedPatients->toArray());
+        return response([
+            "patients" => $allPatients
+        ]);
     }
-
     public function store(Request $request)
     {
         $request->validate([
