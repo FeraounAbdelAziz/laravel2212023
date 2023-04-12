@@ -6,107 +6,43 @@ use App\Models\Temperature;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
+/**
+ * Summary of TemperatureController
+ */
 class TemperatureController extends Controller
 {
     public function getTempPatient(Request $request, string $idPatient)
     {
-        $Temperature = Temperature::where('idPatient', '=', $idPatient)
-            ->whereRaw('DATE(dateCreate) = ?', $request->dateConsult) // this convert the YYYY-MM-DD to YYYY-MM-DD HH-MM-SS
-            ->take(10)
-            ->select("temperature.tempValue", "temperature.dateCreate")
-            ->get();
-        $filteredTemperatures = collect([]);
+        $dateTimeString = date('Y-m-d H:i:s', strtotime($request->dateConsult)); // this convert the YYYY-MM-DD to YYYY-MM-DD HH-MM-SS
 
-        foreach ($Temperature as $key => $temperature) {
-            if ($key === 0) {
-                // add first temperature to the filtered collection
-                $filteredTemperatures->push($temperature);
-            } else {
-                $prevTemperature = $Temperature[$key - 1];
-
-                $date1 = Carbon::parse($temperature->dateCreate);
-                $date2 = Carbon::parse($prevTemperature->dateCreate);
-
-                $diffInSeconds = $date2->diffInSeconds($date1);
-                if ($diffInSeconds >= 5) {
-                    $filteredTemperatures->push($temperature);
-                }
-            }
-        }
-
-        $tempValue = $Temperature->map(function ($temperature) {
-            return $temperature->tempValue;
-        })->sort()->values();
-
-        $dateCreate = $Temperature->map(function ($temperature) {
-            return $temperature->dateCreate;
-        })->sort()->values();
-        return response()->json([
-            'tempValue' => $tempValue,
-            'dateCreate' => $dateCreate,
-        ]);
-
-    }
-
-
-
-
-    public function getTemperaturesForDateRange(Request $request, $idPatient)
-    {
-        $temperatures = Temperature::where('idPatient', $idPatient)
-            ->whereBetween('dateCreate', [$request->startDate, $request->endDate . ' 23:59:59'])
-            ->orderBy('dateCreate')
+        $temperatures = Temperature::where('idPatient', '=', $idPatient)
+            ->whereDate('dateCreate', $dateTimeString)
             ->select("temperature.tempValue", "temperature.dateCreate")
             ->get();
 
-        $groups = [];
-        $groupIndex = 0;
-        $lastTemperature = null;
-        foreach ($temperatures as $temperature) {
-            if (
-                $lastTemperature !== null &&
-                (abs(strtotime($temperature->dateCreate) - strtotime($lastTemperature->dateCreate)) > 10) // if the sub btw dateCreate is greater then 10 do ++
-            ) {
-                $groupIndex++;
-            }
-
-            if (!isset($groups[$groupIndex])) {
-                $groups[$groupIndex] = [];
-            }
-
-            $groups[$groupIndex][] = [
-                'tempValue' => $temperature->tempValue,
-                'dateCreate' => $temperature->dateCreate
-            ];
-
-            $lastTemperature = $temperature;
-        }
+        $groupedTemperatures = $temperatures->groupBy(function ($temperature) {
+            return Carbon::parse($temperature->dateCreate)->format('F j, Y');
+        });
 
         $result = [];
-        foreach ($groups as $group) {
-            $subgroups = array_chunk($group, 10);
-            foreach ($subgroups as $subgroup) {
-                $result[] = $subgroup;
-            }
-        }
+        foreach ($groupedTemperatures as $month => $temperatures) {
+            $tempValues = $temperatures->pluck('tempValue');
+            $dateCreates = $temperatures->pluck('dateCreate');
 
-        $finalResult = [];
-        foreach ($result as $index => $group) {
-            $temperatures = [];
-            $dates = [];
-            foreach ($group as $record) {
-                $temperatures[] = $record['tempValue'];
-                $dates[] = $record['dateCreate'];
-            }
-            $finalResult['temperature' . ($index + 1)] = [
-                'tempValue' => $temperatures,
-                'dateCreate' => $dates,
+            $result[] = [
+                'month' => $month,
+                'temperatures' => [
+                    'tempValue' => $tempValues,
+                    'dateCreate' => $dateCreates
+                ]
             ];
         }
+
         return response()->json([
-            'temperatures' => array_values($finalResult)
+            'temperatures' => $result
         ]);
     }
+
 
     public function lastTemperatureRecord(string $idPatient)
     {
@@ -146,4 +82,61 @@ class TemperatureController extends Controller
             'dateCreate' => $dateCreate,
         ]);
     }
+
+   
+    public function getTemperaturesForDateRange(Request $request, $idPatient)
+    {
+        $temperatures = Temperature::where('idPatient', $idPatient)
+            ->whereBetween('dateCreate', [$request->startDate, $request->endDate . ' 23:59:59'])
+            ->orderBy('dateCreate')
+            ->select("temperature.tempValue", "temperature.dateCreate")
+            ->get();
+
+        $groupedTemperatures = $temperatures->groupBy(function ($temperature) {
+            return Carbon::parse($temperature->dateCreate)->format('F Y');
+        });
+
+        $result = [];
+        foreach ($groupedTemperatures as $month => $temperatures) {
+            $tempValues = $temperatures->pluck('tempValue');
+            $dateCreates = $temperatures->pluck('dateCreate');
+
+            $result[] = [
+                'month' => $month,
+                'temperatures' => [
+                    'tempValue' => $tempValues,
+                    'dateCreate' => $dateCreates
+                ]
+            ];
+        }
+
+        return response([
+            'temperatures' => $result
+        ], 200);
+    }
+
+
+
+//DISPLAY ALL TEMPERATRE IN CASE THE LAST ONE DIDNT WORK !
+// public function getTemperaturesForDateRange(Request $request, $idPatient)
+// {
+//     $temperatures = Temperature::where('idPatient', $idPatient)
+//         ->whereBetween('dateCreate', [$request->startDate, $request->endDate . ' 23:59:59'])
+//         ->orderBy('dateCreate')
+//         ->select("temperature.tempValue", "temperature.dateCreate")
+//         ->get();
+//     $tempValue = $temperatures->map(function ($temperature) {
+//         return $temperature->tempValue;
+//     })->values();
+
+//     $dateCreate = $temperatures->map(function ($temperature) {
+//         return $temperature->dateCreate;
+//     })->values();
+//     return response([
+//         'temperatures' => [
+//             'tempValue' => $tempValue,
+//             'dateCreate' => $dateCreate
+//         ]
+//     ], 200);
+// }
 }

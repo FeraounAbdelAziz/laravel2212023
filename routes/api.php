@@ -4,6 +4,7 @@
 use App\Http\Controllers\AssignmentController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DeviceController;
+use App\Http\Controllers\EnvironmentController;
 use App\Http\Controllers\GpsController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\StatisticsController;
@@ -25,13 +26,18 @@ Route::group(['middleware' => ['api', 'checkAdminToken:api']], function () {
 
     //Gps Controller
     Route::post('/getGpsPatient/{idPatient}', [GpsController::class, 'getGpsPatient']);
-    Route::post('/getLastGpsPatient/{idPatient}', [GpsController::class, 'getLastGpsPatient']);
+    Route::post('/lastGpsPatient/{idPatient}', [GpsController::class, 'getLastGpsPatient']);
     Route::post('/getGpsForDateRange/{idPatient}', [GpsController::class, 'getGpsForDateRange']);
 
     //Temperature Controller
     Route::post('/getTempPatient/{idPatient}', [TemperatureController::class, 'getTempPatient']);
     Route::post('/lastTemperatureRecord/{idPatient}', [TemperatureController::class, 'lastTemperatureRecord']);
     Route::post('/patientTemp/getTemperaturesForDateRange/{idPatient}', [TemperatureController::class, 'getTemperaturesForDateRange']);
+
+   //Environment Controller
+   Route::post('/getEnvironmentPatient/{idPatient}', [EnvironmentController::class, 'getEnvironmentPatient']);
+   Route::post('/lastEnvironmentRecord/{idPatient}', [EnvironmentController::class, 'lastEnvironmentRecord']);
+   Route::post('/getEnvironmentForDateRange/{idPatient}', [EnvironmentController::class, 'getEnvironmentForDateRange']);
 
 
     Route::resource('patient', PatientController::class); // DONE

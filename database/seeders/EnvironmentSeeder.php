@@ -2,12 +2,12 @@
 
 namespace Database\Seeders;
 
-use App\Models\Temperature;
+use App\Models\Environment;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use App\Models\Patient;
 
-class TemperatureSeeder extends Seeder
+class EnvironmentSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -22,26 +22,26 @@ class TemperatureSeeder extends Seeder
             $currentMonth = Carbon::now()->startOfMonth();
             $nextMonth = Carbon::now()->addMonth(10)->startOfMonth();
 
-            $temperatures = [];
+            $environments= [];
             for ($i = 0; $i < 5000; $i++) {
                 $dateCreate = $currentMonth->copy()->addMinutes($i * 30);
-                $temperatures[] = [
+                $environments[] = [
                     'idPatient' => $patient->idPatient,
-                    'tempValue' => rand(35, 42),
+                    'tempEnvValue' => rand(35, 42),
                     'dateCreate' => $dateCreate->toDateTimeString(),
                 ];
             }
 
             for ($i = 0; $i < 5000; $i++) {
                 $dateCreate = $nextMonth->copy()->addMinutes($i * 30);
-                $temperatures[] = [
+                $environments[] = [
                     'idPatient' => $patient->idPatient,
-                    'tempValue' => rand(35, 42),
+                    'tempEnvValue' => rand(35, 42),
                     'dateCreate' => $dateCreate->toDateTimeString(),
                 ];
             }
 
-            Temperature::insert($temperatures);
+            Environment::insert($environments);
         }
     }
 }

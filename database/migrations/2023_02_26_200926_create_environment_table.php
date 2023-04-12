@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('environment', function (Blueprint $table) {
             $table->id('idEnvironment');
             $table->float('tempEnvValue');
-            $table->float('humidityValue');
             $table->unsignedBigInteger('idPatient');
             $table->foreign('idPatient')->references('idPatient')->on('patient')->onDelete('cascade')->onUpdate('cascade');
             $table->timestamp('dateCreate')->useCurrent();
