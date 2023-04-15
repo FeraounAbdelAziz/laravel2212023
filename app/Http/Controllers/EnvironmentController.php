@@ -10,42 +10,34 @@ class EnvironmentController extends Controller
 {
     public function getEnvironmentPatient(Request $request, string $idPatient)
     {
-        $Environment = Environment::where('idPatient', '=', $idPatient)
-            ->whereRaw('DATE(dateCreate) = ?', $request->dateConsult) // this convert the YYYY-MM-DD to YYYY-MM-DD HH-MM-SS
-            ->take(10)
+        $dateTimeString = date('Y-m-d H:i:s', strtotime($request->dateConsult)); // this convert the YYYY-MM-DD to YYYY-MM-DD HH-MM-SS
+
+        $temperatures = Environment::where('idPatient', '=', $idPatient)
+            ->whereDate('dateCreate', $dateTimeString)
             ->select("environment.tempEnvValue", "environment.dateCreate")
             ->get();
-        $filteredTemperatures = collect([]);
 
-        foreach ($Environment as $key => $temperature) {
-            if ($key === 0) {
-                // add first temperature to the filtered collection
-                $filteredTemperatures->push($temperature);
-            } else {
-                $prevTemperature = $Environment[$key - 1];
+        $groupedTemperatures = $temperatures->groupBy(function ($temperature) {
+            return Carbon::parse($temperature->dateCreate)->format('F j, Y');
+        });
 
-                $date1 = Carbon::parse($temperature->dateCreate);
-                $date2 = Carbon::parse($prevTemperature->dateCreate);
+        $result = [];
+        foreach ($groupedTemperatures as $month => $temperatures) {
+            $tempEnvValues = $temperatures->pluck('tempEnvValue');
+            $dateCreates = $temperatures->pluck('dateCreate');
 
-                $diffInSeconds = $date2->diffInSeconds($date1);
-                if ($diffInSeconds >= 5) {
-                    $filteredTemperatures->push($temperature);
-                }
-            }
+            $result[] = [
+                'month' => $month,
+                'temperatures' => [
+                    'tempEnvValue' => $tempEnvValues,
+                    'dateCreate' => $dateCreates
+                ]
+            ];
         }
 
-        $tempEnvValue = $Environment->map(function ($environment) {
-            return $environment->tempEnvValue;
-        })->sort()->values();
-
-        $dateCreate = $Environment->map(function ($environment) {
-            return $environment->dateCreate;
-        })->sort()->values();
         return response()->json([
-            'tempEnvValue' => $tempEnvValue,
-            'dateCreate' => $dateCreate,
+            'temperatures' => $result
         ]);
-
     }
 
     public function lastEnvironmentRecord(string $idPatient)
@@ -141,18 +133,27 @@ class EnvironmentController extends Controller
             ->orderBy('dateCreate')
             ->select("environment.tempEnvValue", "environment.dateCreate")
             ->get();
-        $tempEnvValue = $temperatures->map(function ($temperature) {
-            return $temperature->tempEnvValue;
-        })->values();
 
-        $dateCreate = $temperatures->map(function ($temperature) {
-            return $temperature->dateCreate;
-        })->values();
+        $groupedTemperatures = $temperatures->groupBy(function ($temperature) {
+            return Carbon::parse($temperature->dateCreate)->format('F Y');
+        });
+
+        $result = [];
+        foreach ($groupedTemperatures as $month => $temperatures) {
+            $tempEnvValues = $temperatures->pluck('tempEnvValue');
+            $dateCreates = $temperatures->pluck('dateCreate');
+
+            $result[] = [
+                'month' => $month,
+                'temperatures' => [
+                    'tempEnvValue' => $tempEnvValues,
+                    'dateCreate' => $dateCreates
+                ]
+            ];
+        }
+
         return response([
-            'environments' => [
-                'tempEnvValue' => $tempEnvValue,
-                'dateCreate' => $dateCreate
-            ]
+            'temperatures' => $result
         ], 200);
     }
 }

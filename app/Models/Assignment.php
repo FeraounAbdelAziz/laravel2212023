@@ -9,7 +9,11 @@ class Assignment extends Model
 {
     use HasFactory;
     public $table = 'Assignment';
+    public $timestamps = false;
+
     protected $fillable = [
-        'idAssignment','idPatient','returnDate' , 'dateAssignment',
+        'idPatient',
+        'idDevice',
+        'returnDate',
     ];
 }

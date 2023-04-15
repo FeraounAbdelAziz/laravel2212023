@@ -48,6 +48,7 @@ class Doctor extends Authenticatable implements JWTSubject
     {
         return [
             'email' => $this->email,
+            'idDoctor' => $this->idDoctor,
             'exp' => Carbon::now()->addHours(24)->timestamp,
         ];
     }

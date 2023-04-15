@@ -23,6 +23,10 @@ class AuthController extends Controller
     {
         $this->otp = new Otp;
     }
+
+
+
+
     public function register(Request $request)
     {
         $request->validate([
@@ -37,7 +41,7 @@ class AuthController extends Controller
         $existEmail = Doctor::where('email', $request->email)->first();
         if ($existEmail) {
             $existEmail->notify(new EmailVerificationNotification());
-            // TODO : update the person profile HERE
+
             return response()->json([
                 'doctor' => $existEmail,
             ]);
@@ -54,7 +58,7 @@ class AuthController extends Controller
             'password' => bcrypt($request->password),
             'idPerson' => $person->idPerson, // set idPerson to the id of the newly created person
         ]);
-        $token = Auth::guard('api')->attempt(['email' => $request->email, 'password' => $request->password]);
+        $token = Auth::guard('api')->claims(['idDoctor' => $doctor->idDoctor])->attempt(['email' => $request->email, 'password' => $request->password]);
 
         $doctor->notify(new EmailVerificationNotification());
 
@@ -84,17 +88,23 @@ class AuthController extends Controller
                 'message' => 'Password is incorrect'
             ], 401);
         }
+
         $doctor->notify(new EmailVerificationNotification());
         if ($doctor->isVerified) {
             $response = [
                 'email' => $doctor->email,
             ];
             return response($response, 200);
-        } else {
+        } else if (!($doctor->isVerified)) {
             return response([
-                'message' => 'Unauthorized'
+                'isVerified' => $doctor->isVerified
             ], 401);
         }
+        
+        return response([
+            'message' => 'Unauthorized'
+        ], 401);
+
     }
 
     public function sendEmailVerification(Request $request)

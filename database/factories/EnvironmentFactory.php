@@ -18,7 +18,7 @@ class EnvironmentFactory extends Factory
 
         for ($i = 0; $i < 10; $i++) {
             $environments [] = [
-                'tempEnvValue' => $this->faker->randomFloat(2, 20,23),
+                'tempEnvValue' => $this->faker->randomFloat(2, 20,25),
                 'dateCreate' => $this->faker->dateTimeBetween("-1 week", "now")
             ];
         }

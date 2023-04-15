@@ -4,6 +4,7 @@
 use App\Http\Controllers\AssignmentController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DeviceController;
+use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\EnvironmentController;
 use App\Http\Controllers\GpsController;
 use App\Http\Controllers\PatientController;
@@ -34,10 +35,21 @@ Route::group(['middleware' => ['api', 'checkAdminToken:api']], function () {
     Route::post('/lastTemperatureRecord/{idPatient}', [TemperatureController::class, 'lastTemperatureRecord']);
     Route::post('/patientTemp/getTemperaturesForDateRange/{idPatient}', [TemperatureController::class, 'getTemperaturesForDateRange']);
 
-   //Environment Controller
-   Route::post('/getEnvironmentPatient/{idPatient}', [EnvironmentController::class, 'getEnvironmentPatient']);
-   Route::post('/lastEnvironmentRecord/{idPatient}', [EnvironmentController::class, 'lastEnvironmentRecord']);
-   Route::post('/getEnvironmentForDateRange/{idPatient}', [EnvironmentController::class, 'getEnvironmentForDateRange']);
+    //Environment Controller
+    Route::post('/getEnvironmentPatient/{idPatient}', [EnvironmentController::class, 'getEnvironmentPatient']);
+    Route::post('/lastEnvironmentRecord/{idPatient}', [EnvironmentController::class, 'lastEnvironmentRecord']);
+    Route::post('/getEnvironmentForDateRange/{idPatient}', [EnvironmentController::class, 'getEnvironmentForDateRange']);
+
+
+    //User Controller
+    Route::get('/displayAccounts', [DoctorController::class, 'displayAccounts']);
+    Route::delete('/deleteUser/{id} ', [DoctorController::class, 'deleteUser']);
+    Route::post('/createAdmin ', [DoctorController::class, 'createAdmin']);
+    Route::put('/updateUser/{id}', [DoctorController::class, 'updateUser']);
+
+
+    //Assignment Controller
+    Route::post('/addAssignment', [AssignmentController::class, 'addAssignment']);
 
 
     Route::resource('patient', PatientController::class); // DONE

@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Assignment;
+use App\Models\Device;
+use App\Models\Patient;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
 class AssignmentController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+
     public function index()
     {
         return DB::table('assignment')
@@ -17,18 +18,6 @@ class AssignmentController extends Controller
             ->select('assignment.idPatient', 'assignment.idDevice')
             ->get();
     }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
     public function assignment($id)
     {
         return DB::table('assignment')
@@ -39,19 +28,31 @@ class AssignmentController extends Controller
             ->get();
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
+
+     public function addAssignment(Request $request){
+        $request->validate([
+            'idDevice' => 'required|string',
+            'idPatient' => 'required|string',
+            'returnDate' => 'required|string',
+        ]);
+        $Device = Device::findOrFail($request->idDevice);
+        if($Device->assignmentStatus){
+            return response()->json([
+                "message" => 0
+            ],401);
+        }
+        $Patient = Patient::findOrFail($request->idPatient);
+        if($Patient->assignmentStatus){
+            return response()->json([
+                "message" => 0
+            ],401);
+        }
+        Assignment::create([
+            'idDevice' => $request->idDevice,
+            'idPatient' => $request->idPatient,
+            'returnDate' => $request->returnDate,
+        ]);
+     }
+
 }
