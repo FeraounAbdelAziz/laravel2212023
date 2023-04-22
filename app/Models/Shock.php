@@ -10,5 +10,7 @@ class Shock extends Model
     use HasFactory;
     public $table = 'Shock';
     protected $primaryKey = 'idShock';
+    public $timestamps = false;
+
     protected $fillable = ['idPatient',];
 }

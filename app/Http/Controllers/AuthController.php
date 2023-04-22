@@ -100,7 +100,7 @@ class AuthController extends Controller
                 'isVerified' => $doctor->isVerified
             ], 401);
         }
-        
+
         return response([
             'message' => 'Unauthorized'
         ], 401);

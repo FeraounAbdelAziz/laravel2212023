@@ -27,7 +27,7 @@ class StatisticsController extends Controller
             ->where('assignmentStatus', 0)
             ->get()->count(),
             'TotalUsers' => Doctor::all()->count(),
-            // 'LostDevices' => Doctor::all()->count(),
+            'LostDevices' => Assignment::where('returnDate', '<', date('Y-m-d H:i:s'))->count(),
         ];
         return $data;
     }
