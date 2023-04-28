@@ -13,6 +13,7 @@ class Patient extends Model
     public $timestamps = false;
     protected $fillable = [
         'idPerson',
+        'idDoctor',
         'assignmentStatus',
     ];
 }

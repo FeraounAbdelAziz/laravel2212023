@@ -11,6 +11,5 @@ class Shock extends Model
     public $table = 'Shock';
     protected $primaryKey = 'idShock';
     public $timestamps = false;
-
     protected $fillable = ['idPatient',];
 }

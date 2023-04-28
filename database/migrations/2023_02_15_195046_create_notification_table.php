@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id('idNotification');
             $table->string('content');
             $table->timestamp('dateSent')->useCurrent();
-            $table->boolean('seen');
         });
     }
 

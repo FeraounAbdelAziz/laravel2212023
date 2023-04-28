@@ -14,6 +14,7 @@ class Device extends Model
 
     protected $fillable = [
         'idDevice',
+        'idDoctor',
     ];
 
 }

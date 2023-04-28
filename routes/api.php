@@ -7,7 +7,9 @@ use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\EnvironmentController;
 use App\Http\Controllers\GpsController;
+use App\Http\Controllers\HeartBeatController;
 use App\Http\Controllers\PatientController;
+use App\Http\Controllers\ShockController;
 use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\TemperatureController;
 use App\Http\Controllers\UrgentController;
@@ -24,8 +26,6 @@ Route::post('/resend', [AuthController::class, 'sendEmailVerification']);
 
 Route::group(['middleware' => ['api', 'checkAdminToken:api']], function () {
 
-
-
     //Gps Controller
     Route::post('/getGpsPatient/{idPatient}', [GpsController::class, 'getGpsPatient']);
     Route::post('/lastGpsPatient/{idPatient}', [GpsController::class, 'getLastGpsPatient']);
@@ -41,13 +41,21 @@ Route::group(['middleware' => ['api', 'checkAdminToken:api']], function () {
     Route::post('/lastEnvironmentRecord/{idPatient}', [EnvironmentController::class, 'lastEnvironmentRecord']);
     Route::post('/getEnvironmentForDateRange/{idPatient}', [EnvironmentController::class, 'getEnvironmentForDateRange']);
 
+    //Shock Controller
+    Route::post('/getShockPatient/{idPatient}', [ShockController::class, 'getShockPatient']);
+    Route::post('/getShockForDateRange/{idPatient}', [ShockController::class, 'getShockForDateRange']);
+
+    //HeartBeat Controller
+    Route::post('/getHBPatient/{idPatient}', [HeartBeatController::class, 'getHBPatient']);
+    Route::post('/lastHBRecord/{idPatient}', [HeartBeatController::class, 'lastHBRecord']);
+    Route::post('/getHeartBeatForDateRange/{idPatient}', [HeartBeatController::class, 'getHeartBeatForDateRange']);
+
 
     //User Controller
     Route::get('/displayAccounts', [DoctorController::class, 'displayAccounts']);
     Route::delete('/deleteUser/{id} ', [DoctorController::class, 'deleteUser']);
     Route::post('/createAdmin ', [DoctorController::class, 'createAdmin']);
     Route::put('/updateUser/{id}', [DoctorController::class, 'updateUser']);
-
 
     //Assignment Controller
     Route::get('/assignment/{id}', [AssignmentController::class, 'assignment']);
@@ -61,6 +69,7 @@ Route::group(['middleware' => ['api', 'checkAdminToken:api']], function () {
     Route::resource('patient', PatientController::class); // DONE
     Route::get('/statistics', [StatisticsController::class, 'statistics']);
     Route::post('/logout ', [AuthController::class, 'logout']);
+
     //Device Controller
     Route::delete('/device/{id} ', [DeviceController::class, 'destroy']);
     Route::post('/device ', [DeviceController::class, 'store']);

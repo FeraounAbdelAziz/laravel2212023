@@ -17,6 +17,16 @@ class DeviceController extends Controller
             ->join('person', 'patient.idPerson', '=', 'person.idPerson')
             ->select('patient.*', 'device.*', 'person.*', 'assignment.returnDate')
             ->get();
+        foreach ($assignedDevices as $assigned) {
+
+            $doctorFullName = DB::table('doctor')
+                ->where('doctor.idDoctor', '=', $assigned->idDoctor)
+                ->join('person', 'doctor.idPerson', '=', 'person.idPerson')
+                ->select('person.firstName', 'person.lastName')
+                ->first();
+
+            $assigned->doctorFullName = $doctorFullName->firstName . '' . $doctorFullName->lastName;
+        }
         $unassignedDevices = DB::table('Device')
             ->where('assignmentStatus', 0)->select('device.*')->get();
         foreach ($unassignedDevices as $unassigned) {
@@ -30,6 +40,14 @@ class DeviceController extends Controller
                 $unassigned->birthdate = "null";
                 $unassigned->dateCreate = "null";
                 $unassigned->returnDate = "null";
+
+                $doctorFullName = DB::table('doctor')
+                    ->where('doctor.idDoctor', '=', $unassigned->idDoctor)
+                    ->join('person', 'doctor.idPerson', '=', 'person.idPerson')
+                    ->select('person.firstName', 'person.lastName')
+                    ->first();
+
+                $unassigned->doctorFullName = $doctorFullName->firstName . '' . $doctorFullName->lastName;
             }
         }
         $allDevices = array_merge($assignedDevices->toArray(), $unassignedDevices->toArray());
@@ -51,6 +69,7 @@ class DeviceController extends Controller
         ]);
         $device = Device::create([
             'idDevice' => $data['idDevice'],
+            'idDoctor' => auth()->user()->idDoctor,
             'assignmentStatus' => false,
             'isOnline' => false,
         ]);

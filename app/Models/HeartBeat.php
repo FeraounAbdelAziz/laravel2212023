@@ -10,5 +10,7 @@ class HeartBeat extends Model
     use HasFactory;
     public $table = 'HeartBeat';
     protected $primaryKey = 'idHeartBeat';
+    public $timestamps = false;
+
     protected $fillable = ['idPatient',];
 }

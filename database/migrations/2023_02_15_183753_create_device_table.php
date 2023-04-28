@@ -12,6 +12,10 @@ return new class extends Migration {
     {
         Schema::create('device', function (Blueprint $table) {
             $table->id('idDevice');
+
+            $table->unsignedBigInteger('idDoctor');
+            $table->foreign('idDoctor')->references('idDoctor')->on('doctor');
+
             $table->boolean('assignmentStatus')->default(false);
             $table->boolean('isOnline')->default(false);
         });

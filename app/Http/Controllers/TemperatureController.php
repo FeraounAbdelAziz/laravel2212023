@@ -82,54 +82,6 @@ class TemperatureController extends Controller
         ]);
     }
 
-    //THIS FILL ALL THE DATES BTW THE START_DATE TO END_DATE !!
-    // public function getTemperaturesForDateRange(Request $request, $idPatient)
-    // {
-    //     $temperatures = Temperature::where('idPatient', $idPatient)
-    //         ->whereBetween('dateCreate', [$request->startDate, $request->endDate . ' 23:59:59'])
-    //         ->orderBy('dateCreate')
-    //         ->select("temperature.tempValue", "temperature.dateCreate")
-    //         ->get();
-
-    //     $filledTemperatures = collect([]);
-
-    //     if ($temperatures->count() > 0) {
-    //         $firstReadingDate = $temperatures->first()->dateCreate;
-    //         $lastReadingDate = $temperatures->last()->dateCreate;
-
-    //         // Fill in the missing temperature readings with a 30-minute interval
-    //         $interval = CarbonInterval::minutes(30);
-    //         $currentDate = Carbon::parse($firstReadingDate);
-    //         $endDate = Carbon::parse($lastReadingDate);
-
-    //         while ($currentDate <= $endDate) {
-    //             $matchingReading = $temperatures->firstWhere('dateCreate', $currentDate);
-    //             if ($matchingReading) {
-    //                 $filledTemperatures->push([
-    //                     'tempValue' => $matchingReading->tempValue,
-    //                     'dateCreate' => $currentDate->toDateTimeString(),
-    //                 ]);
-    //             } else {
-    //                 $filledTemperatures->push([
-    //                     'tempValue' => null,
-    //                     'dateCreate' => $currentDate->toDateTimeString(),
-    //                 ]);
-    //             }
-    //             $currentDate->add($interval);
-    //         }
-    //     }
-
-    //     $tempValue = $filledTemperatures->pluck('tempValue')->values();
-    //     $dateCreate = $filledTemperatures->pluck('dateCreate')->values();
-
-    //     return response([
-    //         'temperatures' => [
-    //             'tempValue' => $tempValue,
-    //             'dateCreate' => $dateCreate
-    //         ]
-    //     ], 200);
-    // }
-
     public function getTemperaturesForDateRange(Request $request, $idPatient)
     {
         $temperatures = Temperature::where('idPatient', $idPatient)
@@ -160,27 +112,4 @@ class TemperatureController extends Controller
             'temperatures' => $result
         ], 200);
     }
-
-//DISPLAY ALL TEMPERATRE IN CASE THE LAST ONE DIDNT WORK !
-// public function getTemperaturesForDateRange(Request $request, $idPatient)
-// {
-//     $temperatures = Temperature::where('idPatient', $idPatient)
-//         ->whereBetween('dateCreate', [$request->startDate, $request->endDate . ' 23:59:59'])
-//         ->orderBy('dateCreate')
-//         ->select("temperature.tempValue", "temperature.dateCreate")
-//         ->get();
-//     $tempValue = $temperatures->map(function ($temperature) {
-//         return $temperature->tempValue;
-//     })->values();
-
-//     $dateCreate = $temperatures->map(function ($temperature) {
-//         return $temperature->dateCreate;
-//     })->values();
-//     return response([
-//         'temperatures' => [
-//             'tempValue' => $tempValue,
-//             'dateCreate' => $dateCreate
-//         ]
-//     ], 200);
-// }
 }

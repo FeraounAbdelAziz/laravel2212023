@@ -51,7 +51,9 @@ class AssignmentController extends Controller
                 "message" => 0
             ], 401);
         }
+
         Assignment::create([
+            'idDoctor' => auth()->user()->idDoctor,
             'idDevice' => $request->idDevice,
             'idPatient' => $request->idPatient,
             'returnDate' => $request->returnDate,
@@ -71,24 +73,31 @@ class AssignmentController extends Controller
         $patients = Patient::where('assignmentStatus', 0)->pluck('idPatient');
 
         $optionsDevice = [];
+        $optionsDevice[0] = [
+            "key" => "Select Device ID",
+            "value" => "",
+        ];
+
+
 
         foreach ($devices as $device) {
-            $optionsDevice[0] = [
-                "key" => "Select Device ID",
-                "value" => "",
-            ];
             $optionsDevice[] = [
                 "key" => $device,
                 "value" => $device,
             ];
         }
+
+
+
         $optionsPatient = [];
+        $optionsPatient[0] = [
+            "key" => "Select Patient ID",
+            "value" => '',
+        ];
+
+        
 
         foreach ($patients as $patient) {
-            $optionsPatient[0] = [
-                "key" => "Select Patient ID",
-                "value" => $patient,
-            ];
             $optionsPatient[] = [
                 "key" => $patient,
                 "value" => $patient,

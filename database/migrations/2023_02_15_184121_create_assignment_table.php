@@ -18,6 +18,9 @@ return new class extends Migration {
             $table->unsignedBigInteger('idPatient');
             $table->foreign('idPatient')->references('idPatient')->on('patient')->onDelete('cascade')->onUpdate('cascade');
 
+            $table->unsignedBigInteger('idDoctor');
+            $table->foreign('idDoctor')->references('idDoctor')->on('doctor');
+
             $table->timestamp('dateAssignment')->useCurrent();
             $table->date('returnDate');
             $table->unique(['idPatient']);

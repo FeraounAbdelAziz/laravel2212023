@@ -14,6 +14,8 @@ return new class extends Migration {
             $table->id('idPatient');
             $table->unsignedBigInteger('idPerson');
             $table->foreign('idPerson')->references('idPerson')->on('person')->onDelete('cascade')->onUpdate('cascade');
+            $table->unsignedBigInteger('idDoctor');
+            $table->foreign('idDoctor')->references('idDoctor')->on('doctor');
             $table->boolean('assignmentStatus')->default(false);
         });
         DB::unprepared('CREATE TRIGGER person_from_patient_delete AFTER DELETE ON PATIENT FOR EACH ROW

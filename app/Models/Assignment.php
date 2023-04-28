@@ -14,6 +14,7 @@ class Assignment extends Model
     protected $fillable = [
         'idPatient',
         'idDevice',
+        'idDoctor',
         'returnDate',
     ];
 }
