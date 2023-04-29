@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -13,8 +12,12 @@ return new class extends Migration
     {
         Schema::create('notification', function (Blueprint $table) {
             $table->id('idNotification');
+            $table->unsignedBigInteger('idPatient');
+            $table->foreign('idPatient')->references('idPatient')->on('patient');
             $table->string('content');
-            $table->timestamp('dateSent')->useCurrent();
+            $table->string('type');
+            $table->boolean('status')->default(0);
+            $table->timestamp('dateCreate')->useCurrent();
         });
     }
 

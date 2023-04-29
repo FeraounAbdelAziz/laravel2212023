@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Notification extends Model
 {
     use HasFactory;
-    public $table = 'Notification';
-    protected $fillable = ['contenu', 'dateEnvoi', 'estVu'];
+    public $table = 'notification';
+    protected $primaryKey = 'idNotification';
+    public $timestamps = false;
+
+    protected $fillable = ['content','type', 'dateCreate'];
 }

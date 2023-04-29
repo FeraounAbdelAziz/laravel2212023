@@ -8,6 +8,7 @@ use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\EnvironmentController;
 use App\Http\Controllers\GpsController;
 use App\Http\Controllers\HeartBeatController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\ShockController;
 use App\Http\Controllers\StatisticsController;
@@ -22,6 +23,8 @@ Route::post('/login ', [AuthController::class, 'login']);
 Route::post('/register ', [AuthController::class, 'register']);
 Route::post('/check-email', [AuthController::class, 'checkEmailVerification']);
 Route::post('/resend', [AuthController::class, 'sendEmailVerification']);
+
+Route::get('/sendNotification', [NotificationController::class, 'sendNotification']);
 
 
 Route::group(['middleware' => ['api', 'checkAdminToken:api']], function () {
@@ -77,5 +80,4 @@ Route::group(['middleware' => ['api', 'checkAdminToken:api']], function () {
     Route::get('/deviceAssignment ', [DeviceController::class, 'deviceAssignment']);
 
     // Urgent Controller
-    Route::get('/urgentCase', [UrgentController::class, 'urgentCase']);
 });
