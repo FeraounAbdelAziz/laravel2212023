@@ -13,7 +13,7 @@ return new class extends Migration {
         Schema::create('notification', function (Blueprint $table) {
             $table->id('idNotification');
             $table->unsignedBigInteger('idPatient');
-            $table->foreign('idPatient')->references('idPatient')->on('patient');
+            $table->foreign('idPatient')->references('idPatient')->on('patient')->onDelete('cascade')->onUpdate('cascade');
             $table->string('content');
             $table->string('type');
             $table->boolean('status')->default(0);
