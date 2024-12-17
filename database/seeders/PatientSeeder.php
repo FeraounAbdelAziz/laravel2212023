@@ -1,9 +1,9 @@
 <?php
-
 namespace Database\Seeders;
 
 use App\Models\Patient;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class PatientSeeder extends Seeder
 {
@@ -12,6 +12,12 @@ class PatientSeeder extends Seeder
      */
     public function run(): void
     {
-        Patient::factory()->count(20)->create();
+        // Fetch the first doctor (or any other logic to select a doctor)
+        $doctorId = DB::table('doctor')->first()->idDoctor;
+
+        // Create 20 patients and assign them to the doctor
+        Patient::factory()->count(1)->create([
+            'idDoctor' => $doctorId,  // Assign the doctor ID to the patient
+        ]);
     }
 }

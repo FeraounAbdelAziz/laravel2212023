@@ -27,7 +27,7 @@ Route::post('/resend', [AuthController::class, 'sendEmailVerification']);
 Route::get('/sendNotification', [NotificationController::class, 'sendNotification']);
 
 
-Route::group(['middleware' => ['api', 'checkAdminToken:api']], function () {
+// Route::group(['middleware' => ['api', 'checkAdminToken:api']], function () {
 
     //Gps Controller
     Route::post('/getGpsPatient/{idPatient}', [GpsController::class, 'getGpsPatient']);
@@ -70,6 +70,13 @@ Route::group(['middleware' => ['api', 'checkAdminToken:api']], function () {
 
     //Patient Controller
     Route::resource('patient', PatientController::class); // DONE
+    
+    
+    Route::get('patient', [PatientController::class, 'index'])->name('patient.index');
+    Route::post('patient', [PatientController::class, 'store'])->name('patient.store');
+    Route::put('patient/{patient}', [PatientController::class, 'update'])->name('patient.update');
+    Route::delete('patient/{patient}', [PatientController::class, 'destroy'])->name('patient.destroy');
+
     Route::get('/statistics', [StatisticsController::class, 'statistics']);
     Route::post('/logout ', [AuthController::class, 'logout']);
 
@@ -80,4 +87,4 @@ Route::group(['middleware' => ['api', 'checkAdminToken:api']], function () {
     Route::get('/deviceAssignment ', [DeviceController::class, 'deviceAssignment']);
 
     // Urgent Controller
-});
+// });

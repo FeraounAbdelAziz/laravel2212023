@@ -13,7 +13,7 @@ class PatientController extends Controller
     public function index()
     {
         $doctorFullName = DB::table('doctor')
-        ->where('doctor.idDoctor', '=', auth()->user()->idDoctor)
+        ->where('doctor.idDoctor', '=', '1')
         ->join('person', 'doctor.idPerson', '=', 'person.idPerson')
         ->select('person.firstName', 'person.lastName')->get();
 
@@ -72,7 +72,7 @@ class PatientController extends Controller
 
         DB::table('patient')->insert([
             'idPerson' => $person->idPerson,
-            'idDoctor' => auth()->user()->idDoctor,
+            'idDoctor' => '1',
             'assignmentStatus' => false,
         ]);
         $patient = DB::table('patient')
@@ -92,28 +92,36 @@ class PatientController extends Controller
             ->select('patient.*', 'person.*')
             ->get();
     }
-
     public function update(Request $request, string $id)
     {
+        // Validate only the fields that need to be updated
         $request->validate([
-            'firstName' => 'required',
-            'lastName' => 'required',
-            'birthdate' => 'required|date',
-            'telNum' => 'required',
-            'adress' => 'required',
+            'telNum' => 'required|string',
+            'adress' => 'required|string',
         ]);
-
-        // Update the person's information
-        $person = Person::findOrFail($id);
-        $person->update($request->only(['firstName', 'lastName', 'birthdate', 'telNum', 'adress']));
-
-        // Update the patient's assignment status
-        $patient = DB::table('patient')
-            ->where('idPerson', '=', $id)
-            ->update(['assignmentStatus' => $request->input('assignmentStatus', false)]);
-
-        return response()->json($patient);
+    
+        // Find the patient using the provided ID
+        $patient = Patient::findOrFail($id);
+    
+        // Update the related person's details
+        DB::table('person')
+            ->where('idPerson', $patient->idPerson) // Assuming 'idPerson' links 'person' and 'patient'
+            ->update([
+                'telNum' => $request->input('telNum'),
+                'adress' => $request->input('adress'),
+            ]);
+    
+        // Retrieve the updated person details, excluding the `id` column
+        $person = DB::table('person')
+            ->where('idPerson', $patient->idPerson)
+            ->select('*') // Replace 'other_columns' with any other fields to include
+            ->first();
+    
+        // Return the person's details as JSON
+        return response()->json($person);
     }
+    
+
     //TODO LATER search
     public function search($telNum)
     {
